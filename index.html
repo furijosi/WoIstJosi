@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wo ist Josi?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0b1e35;
+      --deep: #071526;
+      --teal: #00b4c8;
+      --teal-dim: #007d8c;
+      --white: #e8f4f8;
+      --muted: #7a9db5;
+    }
+
+    body {
+      background: var(--deep);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Animated ocean wave background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(0,180,200,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,100,160,0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 22px 32px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0,180,200,0.15);
+      background: rgba(7,21,38,0.85);
+      backdrop-filter: blur(8px);
+      animation: fadeDown 0.7s ease both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .logo-main {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-size: 0.78rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 500;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border: 1px solid rgba(0,180,200,0.3);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    /* Map container */
+    .map-wrapper {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 28px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .map-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--teal-dim);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .map-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, rgba(0,180,200,0.25), transparent);
+    }
+
+    .map-frame {
+      flex: 1;
+      min-height: 520px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(0,180,200,0.2);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.5),
+        0 20px 60px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+      position: relative;
+    }
+
+    .map-frame iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      border: none;
+      display: block;
+    }
+
+    /* Corner decorations */
+    .map-frame::before,
+    .map-frame::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-color: var(--teal);
+      border-style: solid;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .map-frame::before {
+      top: 8px; left: 8px;
+      border-width: 2px 0 0 2px;
+    }
+    .map-frame::after {
+      bottom: 8px; right: 8px;
+      border-width: 0 2px 2px 0;
+    }
+
+    /* Info bar */
+    .info-bar {
+      display: flex;
+      gap: 28px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.9s 0.4s ease both;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .info-key {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .info-val {
+      font-size: 0.9rem;
+      color: var(--white);
+      font-weight: 400;
+    }
+
+    footer {
+      position: relative;
+      z-index: 10;
+      padding: 14px 32px;
+      border-top: 1px solid rgba(0,180,200,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      background: rgba(7,21,38,0.6);
+    }
+
+    footer a {
+      color: var(--teal-dim);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--teal); }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 18px; }
+      .logo-main { font-size: 1.8rem; }
+      .status-pill { display: none; }
+      .map-wrapper { padding: 16px 14px; }
+      footer { flex-direction: column; gap: 6px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-main">WO IST JOSI?</span>
+      <span class="logo-sub">Live-Tracking</span>
+    </div>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      AIS Echtzeit
+    </div>
+  </header>
+
+  <main class="map-wrapper">
+    <div class="map-label">⚓ Aktuelle Position — MMSI 218007170</div>
+
+    <div class="map-frame">
+      <iframe
+        src="https://www.vesselfinder.com/?mmsi=218007170&zoom=10&show_names=1"
+        title="Josi Live Position"
+        allowfullscreen
+        loading="lazy">
+      </iframe>
+    </div>
+
+    <div class="info-bar">
+      <div class="info-item">
+        <span class="info-key">Vessel</span>
+        <span class="info-val">Josi</span>
+      </div>
+      <div class="info-item">
+        <span class="info-key">MMSI</span>
+        <span class="info-val">218007170</span>
+      </div>
+      <div class="info-item">
+        <span class="info-key">Flagge</span>
+        <span class="info-val">🇩🇪 Deutschland</span>
+      </div>
+      <div class="info-item">
+        <span class="info-key">Daten</span>
+        <span class="info-val">VesselFinder AIS</span>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>woistjosi.de</span>
+    <span>Kartendaten: <a href="https://www.vesselfinder.com" target="_blank" rel="noopener">VesselFinder</a></span>
+  </footer>
+
+</body>
+</html>

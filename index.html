@@ -10,7 +10,7 @@
                  initial-scale=1,
                  viewport-fit=cover">
 
-  <!-- iOS APP STYLE -->
+  <!-- iOS / Android App Style -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#071526">
 
@@ -69,7 +69,7 @@
       display: flex;
       flex-direction: column;
 
-      overflow: hidden;
+      overflow-x: hidden;
 
     }
 
@@ -300,6 +300,8 @@
 
       transform: translateZ(0);
 
+      min-height: 400px;
+
     }
 
     #map {
@@ -310,7 +312,7 @@
     }
 
     /************************************************************
-    LEAFLET MOBILE OPTIMIERUNG
+    LEAFLET
     ************************************************************/
 
     .leaflet-container {
@@ -407,7 +409,7 @@
     }
 
     /************************************************************
-    MOBILE
+    MOBILE PORTRAIT
     ************************************************************/
 
     @media (max-width: 768px) {
@@ -455,6 +457,77 @@
         text-align: center;
 
         font-size: 0.6rem;
+
+      }
+
+    }
+
+    /************************************************************
+    ANDROID / IPHONE LANDSCAPE
+    ************************************************************/
+
+    @media (max-width: 950px) and (orientation: landscape) {
+
+      header {
+
+        padding:
+          calc(8px + env(safe-area-inset-top))
+          14px
+          8px;
+
+      }
+
+      .logo-main {
+
+        font-size: 1.3rem;
+
+      }
+
+      .logo-sub {
+
+        font-size: 0.52rem;
+
+      }
+
+      .status-pill {
+
+        display: none;
+
+      }
+
+      .map-wrapper {
+
+        padding: 6px;
+
+      }
+
+      .map-label {
+
+        font-size: 0.48rem;
+
+        margin-bottom: 5px;
+
+        letter-spacing: 0.12em;
+
+      }
+
+      .map-container {
+
+        min-height:
+          calc(
+            100dvh
+            - 95px
+            - env(safe-area-inset-top)
+            - env(safe-area-inset-bottom)
+          );
+
+        border-radius: 8px;
+
+      }
+
+      footer {
+
+        display: none;
 
       }
 
@@ -520,36 +593,55 @@
 
   </footer>
 
-  <!-- LEAFLET -->
+  <!-- MAP SCRIPT -->
 
   <script>
 
     /************************************************************
-    MOBILE CHECK
+    DEVICE CHECK
     ************************************************************/
 
     const mobile = window.innerWidth < 768;
+
+    const landscape =
+      window.matchMedia("(orientation: landscape)").matches;
 
     /************************************************************
     ZOOM
     ************************************************************/
 
-    const zoomLevel = mobile ? 7 : 6;
+    let zoomLevel = 6;
+
+    if (mobile) zoomLevel = 7;
+
+    if (mobile && landscape) zoomLevel = 6;
 
     /************************************************************
-    STARTPOSITION
+    MAP
     ************************************************************/
 
     const map = L.map('map', {
 
-      zoomControl: false,
+      zoomControl: !mobile,
 
-      attributionControl: false
+      attributionControl: false,
+
+      dragging: true,
+
+      touchZoom: true,
+
+      scrollWheelZoom: true,
+
+      doubleClickZoom: true,
+
+      boxZoom: false,
+
+      keyboard: true
 
     }).setView([47.0, -4.0], zoomLevel);
 
     /************************************************************
-    TILES
+    OPENSTREETMAP
     ************************************************************/
 
     L.tileLayer(
@@ -565,7 +657,7 @@
     ).addTo(map);
 
     /************************************************************
-    BOOTS ICON
+    BOAT ICON
     ************************************************************/
 
     const boatIcon = L.divIcon({
@@ -591,7 +683,7 @@
     });
 
     /************************************************************
-    BOOT POSITION
+    POSITION
     ************************************************************/
 
     const boatPosition = [47.0, -4.0];
@@ -609,14 +701,18 @@
     ).addTo(map);
 
     /************************************************************
-    OPTIONAL:
-    HIER SPÄTER AIS POSITION EINSETZEN
+    RESIZE FIX
     ************************************************************/
 
-    /*
-      marker.setLatLng([LAT, LON]);
-      map.setView([LAT, LON], zoomLevel);
-    */
+    window.addEventListener('resize', () => {
+
+      setTimeout(() => {
+
+        map.invalidateSize();
+
+      }, 200);
+
+    });
 
   </script>
 

@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wo ist Josi?</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       --deep: #071526;
@@ -56,7 +62,11 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .logo { display: flex; align-items: baseline; gap: 10px; }
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
 
     .logo-main {
       font-family: 'Bebas Neue', sans-serif;
@@ -88,15 +98,22 @@
     }
 
     .status-dot {
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--teal);
       animation: pulse 2s ease-in-out infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(0.75); }
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.4;
+        transform: scale(0.75);
+      }
     }
 
     .map-wrapper {
@@ -110,8 +127,14 @@
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .map-label {
@@ -144,20 +167,24 @@
       position: relative;
     }
 
-    /* Popup automatisch ausblenden */
-    .map-container .leaflet-popup,
-    .map-container .leaflet-popup-pane,
-    .map-container [class*="popup"],
-    .map-container [class*="vessel-info"],
-    .map-container [class*="ship-info"],
-    .map-container [class*="vf-info"] {
+    /* VesselFinder Popup komplett deaktivieren */
+    .leaflet-popup-pane,
+    .leaflet-popup,
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip-container,
+    .leaflet-popup-close-button {
       display: none !important;
-      visibility: hidden !important;
       opacity: 0 !important;
+      visibility: hidden !important;
       pointer-events: none !important;
     }
 
-    /* Corner decorations */
+    /* Marker weiterhin sichtbar */
+    .leaflet-marker-icon {
+      pointer-events: none !important;
+    }
+
+    /* Corner Decorations */
     .map-container::before,
     .map-container::after {
       content: '';
@@ -169,40 +196,17 @@
       z-index: 2;
       pointer-events: none;
     }
+
     .map-container::before {
-      top: 8px; left: 8px;
+      top: 8px;
+      left: 8px;
       border-width: 2px 0 0 2px;
     }
+
     .map-container::after {
-      bottom: 8px; right: 8px;
+      bottom: 8px;
+      right: 8px;
       border-width: 0 2px 2px 0;
-    }
-
-    .info-bar {
-      display: flex;
-      gap: 28px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-      animation: fadeUp 0.9s 0.4s ease both;
-    }
-
-    .info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .info-key {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .info-val {
-      font-size: 0.9rem;
-      color: var(--white);
-      font-weight: 400;
     }
 
     footer {
@@ -219,19 +223,45 @@
       background: rgba(7,21,38,0.6);
     }
 
-    footer a { color: var(--teal-dim); text-decoration: none; }
-    footer a:hover { color: var(--teal); }
+    footer a {
+      color: var(--teal-dim);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--teal);
+    }
 
     @media (max-width: 600px) {
-      header { padding: 16px 18px; }
-      .logo-main { font-size: 1.8rem; }
-      .status-pill { display: none; }
-      .map-wrapper { padding: 16px 14px; }
-      .map-container { min-height: 380px; }
-      footer { flex-direction: column; gap: 6px; text-align: center; }
+      header {
+        padding: 16px 18px;
+      }
+
+      .logo-main {
+        font-size: 1.8rem;
+      }
+
+      .status-pill {
+        display: none;
+      }
+
+      .map-wrapper {
+        padding: 16px 14px;
+      }
+
+      .map-container {
+        min-height: 380px;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <header>
@@ -239,6 +269,7 @@
       <span class="logo-main">WO IST JOSI?</span>
       <span class="logo-sub">Live-Tracking</span>
     </div>
+
     <div class="status-pill">
       <span class="status-dot"></span>
       AIS Echtzeit
@@ -246,43 +277,46 @@
   </header>
 
   <main class="map-wrapper">
-    <div class="map-label">⚓ Aktuelle Position — MMSI 218007170</div>
+
+    <div class="map-label">
+      ⚓ Aktuelle Position — MMSI 218007170
+    </div>
 
     <div class="map-container">
+
       <script type="text/javascript">
         var width      = "100%";
         var height     = "520";
+
         var mmsi       = "218007170";
+
         var show_track = true;
         var names      = false;
-        var zoom       = 7;
-      </script>
-      <script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>
 
-  <script>
-    // Popup automatisch schließen sobald die Karte geladen ist
-    function closePopup() {
-      var selectors = [
-        '.leaflet-popup-close-button',
-        '[class*="popup"] [class*="close"]',
-        '[class*="close-btn"]',
-        '.vf-close'
-      ];
-      selectors.forEach(function(sel) {
-        var el = document.querySelector(sel);
-        if (el) el.click();
-      });
-    }
-    setTimeout(closePopup, 1500);
-    setTimeout(closePopup, 3000);
-    setTimeout(closePopup, 5000);
-  </script>
+        /* weiter herausgezoomt */
+        var zoom       = 6;
+      </script>
+
+      <script
+        type="text/javascript"
+        src="https://www.vesselfinder.com/aismap.js">
+      </script>
+
     </div>
+
   </main>
 
   <footer>
     <span>woistjosi.de</span>
-    <span>Kartendaten: <a href="https://www.vesselfinder.com" target="_blank" rel="noopener">VesselFinder</a></span>
+
+    <span>
+      Kartendaten:
+      <a href="https://www.vesselfinder.com"
+         target="_blank"
+         rel="noopener">
+         VesselFinder
+      </a>
+    </span>
   </footer>
 
 </body>

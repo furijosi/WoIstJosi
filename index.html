@@ -54,12 +54,6 @@
       border-bottom: 1px solid rgba(0,180,200,0.15);
       background: rgba(7,21,38,0.85);
       backdrop-filter: blur(8px);
-      animation: fadeDown 0.7s ease both;
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-16px); }
-      to   { opacity: 1; transform: translateY(0); }
     }
 
     .logo {
@@ -123,18 +117,6 @@
       display: flex;
       flex-direction: column;
       padding: 24px 28px;
-      animation: fadeUp 0.8s 0.2s ease both;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .map-label {
@@ -167,7 +149,7 @@
       position: relative;
     }
 
-    /* VesselFinder Popup komplett deaktivieren */
+    /* Alle VesselFinder Popups verstecken */
     .leaflet-popup-pane,
     .leaflet-popup,
     .leaflet-popup-content-wrapper,
@@ -176,11 +158,6 @@
       display: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
-      pointer-events: none !important;
-    }
-
-    /* Marker weiterhin sichtbar */
-    .leaflet-marker-icon {
       pointer-events: none !important;
     }
 
@@ -193,7 +170,7 @@
       height: 18px;
       border-color: var(--teal);
       border-style: solid;
-      z-index: 2;
+      z-index: 999;
       pointer-events: none;
     }
 
@@ -233,6 +210,7 @@
     }
 
     @media (max-width: 600px) {
+
       header {
         padding: 16px 18px;
       }
@@ -259,12 +237,14 @@
         text-align: center;
       }
     }
+
   </style>
 </head>
 
 <body>
 
   <header>
+
     <div class="logo">
       <span class="logo-main">WO IST JOSI?</span>
       <span class="logo-sub">Live-Tracking</span>
@@ -274,6 +254,7 @@
       <span class="status-dot"></span>
       AIS Echtzeit
     </div>
+
   </header>
 
   <main class="map-wrapper">
@@ -285,6 +266,7 @@
     <div class="map-container">
 
       <script type="text/javascript">
+
         var width      = "100%";
         var height     = "520";
 
@@ -295,6 +277,7 @@
 
         /* weiter herausgezoomt */
         var zoom       = 6;
+
       </script>
 
       <script
@@ -302,11 +285,37 @@
         src="https://www.vesselfinder.com/aismap.js">
       </script>
 
+      <script>
+
+        function removeVFPopups() {
+
+          /* Alle Popup Elemente entfernen */
+          document.querySelectorAll('.leaflet-popup-pane').forEach(el => {
+            el.remove();
+          });
+
+          document.querySelectorAll('.leaflet-popup').forEach(el => {
+            el.remove();
+          });
+
+          /* Klicks auf Schiffsmarker deaktivieren */
+          document.querySelectorAll('.leaflet-marker-icon').forEach(el => {
+            el.style.pointerEvents = 'none';
+          });
+
+        }
+
+        /* dauerhaft ausführen weil VesselFinder dynamisch nachlädt */
+        setInterval(removeVFPopups, 500);
+
+      </script>
+
     </div>
 
   </main>
 
   <footer>
+
     <span>woistjosi.de</span>
 
     <span>
@@ -314,9 +323,10 @@
       <a href="https://www.vesselfinder.com"
          target="_blank"
          rel="noopener">
-         VesselFinder
+        VesselFinder
       </a>
     </span>
+
   </footer>
 
 </body>

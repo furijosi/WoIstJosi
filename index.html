@@ -1,333 +1,624 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- MOBILE OPTIMIERT -->
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1,
+                 viewport-fit=cover">
+
+  <!-- iOS APP STYLE -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#071526">
+
   <title>Wo ist Josi?</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+  <!-- LEAFLET -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <style>
+
+    /************************************************************
+    RESET
+    ************************************************************/
+
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
     :root {
+
       --deep: #071526;
       --teal: #00b4c8;
       --teal-dim: #007d8c;
       --white: #e8f4f8;
       --muted: #7a9db5;
+
     }
 
+    /************************************************************
+    BODY
+    ************************************************************/
+
     body {
+
       background: var(--deep);
       color: var(--white);
+
       font-family: 'Barlow', sans-serif;
       font-weight: 300;
-      min-height: 100vh;
+
+      min-height: 100dvh;
+
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+
+      overflow: hidden;
+
     }
 
     body::before {
+
       content: '';
+
       position: fixed;
       inset: 0;
+
       background:
-        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(0,180,200,0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,100,160,0.08) 0%, transparent 55%);
+
+        radial-gradient(
+          ellipse 80% 50% at 20% 80%,
+          rgba(0,180,200,0.07) 0%,
+          transparent 60%
+        ),
+
+        radial-gradient(
+          ellipse 60% 40% at 80% 20%,
+          rgba(0,100,160,0.08) 0%,
+          transparent 55%
+        );
+
       pointer-events: none;
       z-index: 0;
+
     }
 
+    /************************************************************
+    HEADER
+    ************************************************************/
+
     header {
+
       position: relative;
-      z-index: 10;
-      padding: 22px 32px 18px;
+      z-index: 1000;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(0,180,200,0.15);
-      background: rgba(7,21,38,0.85);
-      backdrop-filter: blur(8px);
+
+      padding:
+
+        calc(16px + env(safe-area-inset-top))
+        24px
+        16px;
+
+      border-bottom:
+        1px solid rgba(0,180,200,0.15);
+
+      background:
+        rgba(7,21,38,0.85);
+
+      backdrop-filter: blur(10px);
+
     }
 
     .logo {
+
       display: flex;
       align-items: baseline;
       gap: 10px;
+
     }
 
     .logo-main {
+
       font-family: 'Bebas Neue', sans-serif;
+
       font-size: 2.4rem;
+
       letter-spacing: 0.08em;
+
       color: var(--white);
+
       line-height: 1;
+
     }
 
     .logo-sub {
-      font-size: 0.78rem;
+
+      font-size: 0.75rem;
+
       letter-spacing: 0.25em;
+
       text-transform: uppercase;
+
       color: var(--teal);
+
       font-weight: 500;
+
     }
 
     .status-pill {
+
       display: flex;
       align-items: center;
       gap: 8px;
+
       padding: 6px 14px;
-      border: 1px solid rgba(0,180,200,0.3);
+
+      border:
+        1px solid rgba(0,180,200,0.3);
+
       border-radius: 999px;
-      font-size: 0.75rem;
+
+      font-size: 0.72rem;
+
       letter-spacing: 0.15em;
+
       text-transform: uppercase;
+
       color: var(--muted);
+
     }
 
     .status-dot {
+
       width: 8px;
       height: 8px;
+
       border-radius: 50%;
+
       background: var(--teal);
+
       animation: pulse 2s ease-in-out infinite;
+
     }
 
     @keyframes pulse {
+
       0%, 100% {
+
         opacity: 1;
         transform: scale(1);
+
       }
+
       50% {
+
         opacity: 0.4;
         transform: scale(0.75);
+
       }
+
     }
 
+    /************************************************************
+    MAP WRAPPER
+    ************************************************************/
+
     .map-wrapper {
+
       position: relative;
       z-index: 5;
+
       flex: 1;
+
       display: flex;
       flex-direction: column;
-      padding: 24px 28px;
+
+      padding: 18px;
+
+      overflow: hidden;
+
     }
 
     .map-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
+
+      font-size: 0.65rem;
+
+      letter-spacing: 0.25em;
+
       text-transform: uppercase;
+
       color: var(--teal-dim);
-      margin-bottom: 12px;
+
+      margin-bottom: 10px;
+
       display: flex;
       align-items: center;
       gap: 10px;
+
+      padding-left: 4px;
+
     }
 
     .map-label::after {
+
       content: '';
+
       flex: 1;
+
       height: 1px;
-      background: linear-gradient(to right, rgba(0,180,200,0.25), transparent);
+
+      background:
+        linear-gradient(
+          to right,
+          rgba(0,180,200,0.25),
+          transparent
+        );
+
     }
+
+    /************************************************************
+    MAP
+    ************************************************************/
 
     .map-container {
-      flex: 1;
-      min-height: 520px;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid rgba(0,180,200,0.2);
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.5),
-        0 20px 60px rgba(0,0,0,0.5);
+
       position: relative;
+
+      flex: 1;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      border:
+        1px solid rgba(0,180,200,0.2);
+
+      box-shadow:
+
+        0 0 0 1px rgba(0,0,0,0.5),
+
+        0 20px 60px rgba(0,0,0,0.5);
+
+      transform: translateZ(0);
+
     }
 
-    /* Alle VesselFinder Popups verstecken */
-    .leaflet-popup-pane,
-    .leaflet-popup,
-    .leaflet-popup-content-wrapper,
-    .leaflet-popup-tip-container,
-    .leaflet-popup-close-button {
-      display: none !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
+    #map {
+
+      width: 100%;
+      height: 100%;
+
     }
 
-    /* Corner Decorations */
+    /************************************************************
+    LEAFLET MOBILE OPTIMIERUNG
+    ************************************************************/
+
+    .leaflet-container {
+
+      background: #071526;
+
+      touch-action: pan-x pan-y;
+
+      -webkit-tap-highlight-color: transparent;
+
+    }
+
+    /************************************************************
+    CORNER DETAILS
+    ************************************************************/
+
     .map-container::before,
     .map-container::after {
+
       content: '';
+
       position: absolute;
+
       width: 18px;
       height: 18px;
+
       border-color: var(--teal);
       border-style: solid;
+
       z-index: 999;
+
       pointer-events: none;
+
     }
 
     .map-container::before {
-      top: 8px;
-      left: 8px;
+
+      top: 10px;
+      left: 10px;
+
       border-width: 2px 0 0 2px;
+
     }
 
     .map-container::after {
-      bottom: 8px;
-      right: 8px;
+
+      bottom: 10px;
+      right: 10px;
+
       border-width: 0 2px 2px 0;
+
     }
 
+    /************************************************************
+    FOOTER
+    ************************************************************/
+
     footer {
+
       position: relative;
-      z-index: 10;
-      padding: 14px 32px;
-      border-top: 1px solid rgba(0,180,200,0.1);
+      z-index: 1000;
+
+      padding:
+
+        12px
+        22px
+        calc(12px + env(safe-area-inset-bottom));
+
+      border-top:
+        1px solid rgba(0,180,200,0.1);
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.7rem;
+
+      font-size: 0.68rem;
+
       color: var(--muted);
+
       letter-spacing: 0.08em;
-      background: rgba(7,21,38,0.6);
+
+      background:
+        rgba(7,21,38,0.6);
+
+      backdrop-filter: blur(10px);
+
     }
 
     footer a {
+
       color: var(--teal-dim);
       text-decoration: none;
+
     }
 
-    footer a:hover {
-      color: var(--teal);
-    }
+    /************************************************************
+    MOBILE
+    ************************************************************/
 
-    @media (max-width: 600px) {
-
-      header {
-        padding: 16px 18px;
-      }
+    @media (max-width: 768px) {
 
       .logo-main {
-        font-size: 1.8rem;
+
+        font-size: 1.7rem;
+
+      }
+
+      .logo-sub {
+
+        font-size: 0.62rem;
+
       }
 
       .status-pill {
+
         display: none;
+
       }
 
       .map-wrapper {
-        padding: 16px 14px;
+
+        padding: 10px;
+
       }
 
-      .map-container {
-        min-height: 380px;
+      .map-label {
+
+        font-size: 0.55rem;
+
+        letter-spacing: 0.18em;
+
+        margin-bottom: 8px;
+
       }
 
       footer {
+
         flex-direction: column;
-        gap: 6px;
+
+        gap: 4px;
+
         text-align: center;
+
+        font-size: 0.6rem;
+
       }
+
     }
 
   </style>
+
 </head>
 
 <body>
 
+  <!-- HEADER -->
+
   <header>
 
     <div class="logo">
-      <span class="logo-main">WO IST JOSI?</span>
-      <span class="logo-sub">Live-Tracking</span>
+
+      <span class="logo-main">
+        WO IST JOSI?
+      </span>
+
+      <span class="logo-sub">
+        LIVE TRACKING
+      </span>
+
     </div>
 
     <div class="status-pill">
+
       <span class="status-dot"></span>
-      AIS Echtzeit
+
+      AIS ECHTZEIT
+
     </div>
 
   </header>
 
+  <!-- MAP -->
+
   <main class="map-wrapper">
 
     <div class="map-label">
-      ⚓ Aktuelle Position — MMSI 218007170
+      ⚓ AKTUELLE POSITION — MMSI 218007170
     </div>
 
     <div class="map-container">
 
-      <script type="text/javascript">
-
-        var width      = "100%";
-        var height     = "520";
-
-        var mmsi       = "218007170";
-
-        var show_track = true;
-        var names      = false;
-
-        /* weiter herausgezoomt */
-        var zoom       = 6;
-
-      </script>
-
-      <script
-        type="text/javascript"
-        src="https://www.vesselfinder.com/aismap.js">
-      </script>
-
-      <script>
-
-        function removeVFPopups() {
-
-          /* Alle Popup Elemente entfernen */
-          document.querySelectorAll('.leaflet-popup-pane').forEach(el => {
-            el.remove();
-          });
-
-          document.querySelectorAll('.leaflet-popup').forEach(el => {
-            el.remove();
-          });
-
-          /* Klicks auf Schiffsmarker deaktivieren */
-          document.querySelectorAll('.leaflet-marker-icon').forEach(el => {
-            el.style.pointerEvents = 'none';
-          });
-
-        }
-
-        /* dauerhaft ausführen weil VesselFinder dynamisch nachlädt */
-        setInterval(removeVFPopups, 500);
-
-      </script>
+      <div id="map"></div>
 
     </div>
 
   </main>
+
+  <!-- FOOTER -->
 
   <footer>
 
     <span>woistjosi.de</span>
 
     <span>
-      Kartendaten:
-      <a href="https://www.vesselfinder.com"
-         target="_blank"
-         rel="noopener">
-        VesselFinder
-      </a>
+      OpenStreetMap • AIS Tracking
     </span>
 
   </footer>
+
+  <!-- LEAFLET -->
+
+  <script>
+
+    /************************************************************
+    MOBILE CHECK
+    ************************************************************/
+
+    const mobile = window.innerWidth < 768;
+
+    /************************************************************
+    ZOOM
+    ************************************************************/
+
+    const zoomLevel = mobile ? 7 : 6;
+
+    /************************************************************
+    STARTPOSITION
+    ************************************************************/
+
+    const map = L.map('map', {
+
+      zoomControl: false,
+
+      attributionControl: false
+
+    }).setView([47.0, -4.0], zoomLevel);
+
+    /************************************************************
+    TILES
+    ************************************************************/
+
+    L.tileLayer(
+
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+
+      {
+
+        maxZoom: 18
+
+      }
+
+    ).addTo(map);
+
+    /************************************************************
+    BOOTS ICON
+    ************************************************************/
+
+    const boatIcon = L.divIcon({
+
+      className: 'boat-icon',
+
+      html: `
+        <div style="
+          width:18px;
+          height:18px;
+          background:#00b4c8;
+          border-radius:50%;
+          box-shadow:
+            0 0 12px rgba(0,180,200,0.9),
+            0 0 24px rgba(0,180,200,0.4);
+        "></div>
+      `,
+
+      iconSize: [18,18],
+
+      iconAnchor: [9,9]
+
+    });
+
+    /************************************************************
+    BOOT POSITION
+    ************************************************************/
+
+    const boatPosition = [47.0, -4.0];
+
+    const marker = L.marker(
+
+      boatPosition,
+
+      {
+
+        icon: boatIcon
+
+      }
+
+    ).addTo(map);
+
+    /************************************************************
+    OPTIONAL:
+    HIER SPÄTER AIS POSITION EINSETZEN
+    ************************************************************/
+
+    /*
+      marker.setLatLng([LAT, LON]);
+      map.setView([LAT, LON], zoomLevel);
+    */
+
+  </script>
 
 </body>
 </html>

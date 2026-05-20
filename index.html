@@ -2,719 +2,509 @@
 <html lang="de">
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <!-- MOBILE OPTIMIERT -->
-  <meta name="viewport"
-        content="width=device-width,
-                 initial-scale=1,
-                 viewport-fit=cover">
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1,
+               viewport-fit=cover">
 
-  <!-- iOS / Android App Style -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#071526">
+<meta name="theme-color" content="#071526">
 
-  <title>Wo ist Josi?</title>
+<title>Wo ist Josi?</title>
 
-  <!-- FONTS -->
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap"
-        rel="stylesheet">
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-  <!-- LEAFLET -->
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap"
+      rel="stylesheet">
 
-  <style>
+<style>
 
-    /************************************************************
-    RESET
-    ************************************************************/
+/************************************************************
+RESET
+************************************************************/
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    html {
-      -webkit-text-size-adjust: 100%;
-    }
+html,
+body {
 
-    :root {
+  width: 100%;
+  height: 100%;
 
-      --deep: #071526;
-      --teal: #00b4c8;
-      --teal-dim: #007d8c;
-      --white: #e8f4f8;
-      --muted: #7a9db5;
+  overflow: hidden;
 
-    }
+  background: #071526;
 
-    /************************************************************
-    BODY
-    ************************************************************/
+  font-family: 'Barlow', sans-serif;
 
-    body {
+}
 
-      background: var(--deep);
-      color: var(--white);
+/************************************************************
+BODY
+************************************************************/
 
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
+body {
 
-      min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 
-      display: flex;
-      flex-direction: column;
+  color: #e8f4f8;
 
-      overflow-x: hidden;
+}
 
-    }
+/************************************************************
+HEADER
+************************************************************/
 
-    body::before {
+header {
 
-      content: '';
+  z-index: 1000;
 
-      position: fixed;
-      inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-      background:
+  padding:
+    calc(14px + env(safe-area-inset-top))
+    18px
+    14px;
 
-        radial-gradient(
-          ellipse 80% 50% at 20% 80%,
-          rgba(0,180,200,0.07) 0%,
-          transparent 60%
-        ),
+  background:
+    rgba(7,21,38,0.88);
 
-        radial-gradient(
-          ellipse 60% 40% at 80% 20%,
-          rgba(0,100,160,0.08) 0%,
-          transparent 55%
-        );
+  backdrop-filter: blur(10px);
 
-      pointer-events: none;
-      z-index: 0;
+  border-bottom:
+    1px solid rgba(0,180,200,0.15);
 
-    }
+}
 
-    /************************************************************
-    HEADER
-    ************************************************************/
+.logo {
 
-    header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 
-      position: relative;
-      z-index: 1000;
+}
 
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+.logo-main {
 
-      padding:
+  font-family: 'Bebas Neue', sans-serif;
 
-        calc(16px + env(safe-area-inset-top))
-        24px
-        16px;
+  font-size: 2.2rem;
 
-      border-bottom:
-        1px solid rgba(0,180,200,0.15);
+  letter-spacing: 0.08em;
 
-      background:
-        rgba(7,21,38,0.85);
+}
 
-      backdrop-filter: blur(10px);
+.logo-sub {
 
-    }
+  font-size: 0.7rem;
 
-    .logo {
+  color: #00b4c8;
 
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
+  letter-spacing: 0.22em;
 
-    }
+}
 
-    .logo-main {
+/************************************************************
+STATUS
+************************************************************/
 
-      font-family: 'Bebas Neue', sans-serif;
+.status-pill {
 
-      font-size: 2.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-      letter-spacing: 0.08em;
+  padding: 6px 12px;
 
-      color: var(--white);
+  border:
+    1px solid rgba(0,180,200,0.3);
 
-      line-height: 1;
+  border-radius: 999px;
 
-    }
+  font-size: 0.72rem;
 
-    .logo-sub {
+  color: #7a9db5;
 
-      font-size: 0.75rem;
+}
 
-      letter-spacing: 0.25em;
+.status-dot {
 
-      text-transform: uppercase;
+  width: 8px;
+  height: 8px;
 
-      color: var(--teal);
+  border-radius: 50%;
 
-      font-weight: 500;
+  background: #00b4c8;
 
-    }
+  animation: pulse 2s infinite;
 
-    .status-pill {
+}
 
-      display: flex;
-      align-items: center;
-      gap: 8px;
+@keyframes pulse {
 
-      padding: 6px 14px;
+  0%,100% {
 
-      border:
-        1px solid rgba(0,180,200,0.3);
+    opacity: 1;
 
-      border-radius: 999px;
+  }
 
-      font-size: 0.72rem;
+  50% {
 
-      letter-spacing: 0.15em;
+    opacity: 0.4;
 
-      text-transform: uppercase;
+  }
 
-      color: var(--muted);
+}
 
-    }
+/************************************************************
+MAP WRAPPER
+************************************************************/
 
-    .status-dot {
+.map-wrapper {
 
-      width: 8px;
-      height: 8px;
+  flex: 1;
 
-      border-radius: 50%;
+  display: flex;
+  flex-direction: column;
 
-      background: var(--teal);
+  padding: 10px;
 
-      animation: pulse 2s ease-in-out infinite;
+  min-height: 0;
 
-    }
+}
 
-    @keyframes pulse {
+/************************************************************
+LABEL
+************************************************************/
 
-      0%, 100% {
+.map-label {
 
-        opacity: 1;
-        transform: scale(1);
+  font-size: 0.58rem;
 
-      }
+  letter-spacing: 0.18em;
 
-      50% {
+  color: #007d8c;
 
-        opacity: 0.4;
-        transform: scale(0.75);
+  margin-bottom: 8px;
 
-      }
+  text-transform: uppercase;
 
-    }
+}
 
-    /************************************************************
-    MAP WRAPPER
-    ************************************************************/
+/************************************************************
+MAP CONTAINER
+************************************************************/
 
-    .map-wrapper {
+.map-container {
 
-      position: relative;
-      z-index: 5;
+  position: relative;
 
-      flex: 1;
+  flex: 1;
 
-      display: flex;
-      flex-direction: column;
+  min-height: 0;
 
-      padding: 18px;
+  border-radius: 10px;
 
-      overflow: hidden;
+  overflow: hidden;
 
-    }
+  border:
+    1px solid rgba(0,180,200,0.2);
 
-    .map-label {
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.45);
 
-      font-size: 0.65rem;
+}
 
-      letter-spacing: 0.25em;
+/************************************************************
+MAP
+************************************************************/
 
-      text-transform: uppercase;
+#map {
 
-      color: var(--teal-dim);
+  width: 100%;
+  height: 100%;
 
-      margin-bottom: 10px;
+}
 
-      display: flex;
-      align-items: center;
-      gap: 10px;
+/************************************************************
+LEAFLET
+************************************************************/
 
-      padding-left: 4px;
+.leaflet-container {
 
-    }
+  background: #071526;
 
-    .map-label::after {
+  touch-action: pan-x pan-y;
 
-      content: '';
+}
 
-      flex: 1;
+/************************************************************
+FOOTER
+************************************************************/
 
-      height: 1px;
+footer {
 
-      background:
-        linear-gradient(
-          to right,
-          rgba(0,180,200,0.25),
-          transparent
-        );
+  padding:
+    10px
+    18px
+    calc(10px + env(safe-area-inset-bottom));
 
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    /************************************************************
-    MAP
-    ************************************************************/
+  font-size: 0.62rem;
 
-    .map-container {
+  color: #7a9db5;
 
-      position: relative;
+  background:
+    rgba(7,21,38,0.7);
 
-      flex: 1;
+  border-top:
+    1px solid rgba(0,180,200,0.1);
 
-      border-radius: 12px;
+}
 
-      overflow: hidden;
+/************************************************************
+MOBILE
+************************************************************/
 
-      border:
-        1px solid rgba(0,180,200,0.2);
+@media (max-width: 768px) {
 
-      box-shadow:
+  .logo-main {
 
-        0 0 0 1px rgba(0,0,0,0.5),
+    font-size: 1.6rem;
 
-        0 20px 60px rgba(0,0,0,0.5);
+  }
 
-      transform: translateZ(0);
+  .logo-sub {
 
-      min-height: 400px;
+    font-size: 0.58rem;
 
-    }
+  }
 
-    #map {
+  .status-pill {
 
-      width: 100%;
-      height: 100%;
+    display: none;
 
-    }
+  }
 
-    /************************************************************
-    LEAFLET
-    ************************************************************/
+  footer {
 
-    .leaflet-container {
+    flex-direction: column;
 
-      background: #071526;
+    gap: 4px;
 
-      touch-action: pan-x pan-y;
+    text-align: center;
 
-      -webkit-tap-highlight-color: transparent;
+  }
 
-    }
+}
 
-    /************************************************************
-    CORNER DETAILS
-    ************************************************************/
+/************************************************************
+LANDSCAPE MOBILE
+************************************************************/
 
-    .map-container::before,
-    .map-container::after {
+@media (max-width: 950px) and (orientation: landscape) {
 
-      content: '';
+  header {
 
-      position: absolute;
+    padding:
+      calc(8px + env(safe-area-inset-top))
+      14px
+      8px;
 
-      width: 18px;
-      height: 18px;
+  }
 
-      border-color: var(--teal);
-      border-style: solid;
+  .logo-main {
 
-      z-index: 999;
+    font-size: 1.2rem;
 
-      pointer-events: none;
+  }
 
-    }
+  .map-wrapper {
 
-    .map-container::before {
+    padding: 6px;
 
-      top: 10px;
-      left: 10px;
+  }
 
-      border-width: 2px 0 0 2px;
+  .map-label {
 
-    }
+    margin-bottom: 5px;
 
-    .map-container::after {
+    font-size: 0.48rem;
 
-      bottom: 10px;
-      right: 10px;
+  }
 
-      border-width: 0 2px 2px 0;
+  footer {
 
-    }
+    display: none;
 
-    /************************************************************
-    FOOTER
-    ************************************************************/
+  }
 
-    footer {
+}
 
-      position: relative;
-      z-index: 1000;
-
-      padding:
-
-        12px
-        22px
-        calc(12px + env(safe-area-inset-bottom));
-
-      border-top:
-        1px solid rgba(0,180,200,0.1);
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      font-size: 0.68rem;
-
-      color: var(--muted);
-
-      letter-spacing: 0.08em;
-
-      background:
-        rgba(7,21,38,0.6);
-
-      backdrop-filter: blur(10px);
-
-    }
-
-    footer a {
-
-      color: var(--teal-dim);
-      text-decoration: none;
-
-    }
-
-    /************************************************************
-    MOBILE PORTRAIT
-    ************************************************************/
-
-    @media (max-width: 768px) {
-
-      .logo-main {
-
-        font-size: 1.7rem;
-
-      }
-
-      .logo-sub {
-
-        font-size: 0.62rem;
-
-      }
-
-      .status-pill {
-
-        display: none;
-
-      }
-
-      .map-wrapper {
-
-        padding: 10px;
-
-      }
-
-      .map-label {
-
-        font-size: 0.55rem;
-
-        letter-spacing: 0.18em;
-
-        margin-bottom: 8px;
-
-      }
-
-      footer {
-
-        flex-direction: column;
-
-        gap: 4px;
-
-        text-align: center;
-
-        font-size: 0.6rem;
-
-      }
-
-    }
-
-    /************************************************************
-    ANDROID / IPHONE LANDSCAPE
-    ************************************************************/
-
-    @media (max-width: 950px) and (orientation: landscape) {
-
-      header {
-
-        padding:
-          calc(8px + env(safe-area-inset-top))
-          14px
-          8px;
-
-      }
-
-      .logo-main {
-
-        font-size: 1.3rem;
-
-      }
-
-      .logo-sub {
-
-        font-size: 0.52rem;
-
-      }
-
-      .status-pill {
-
-        display: none;
-
-      }
-
-      .map-wrapper {
-
-        padding: 6px;
-
-      }
-
-      .map-label {
-
-        font-size: 0.48rem;
-
-        margin-bottom: 5px;
-
-        letter-spacing: 0.12em;
-
-      }
-
-      .map-container {
-
-        min-height:
-          calc(
-            100dvh
-            - 95px
-            - env(safe-area-inset-top)
-            - env(safe-area-inset-bottom)
-          );
-
-        border-radius: 8px;
-
-      }
-
-      footer {
-
-        display: none;
-
-      }
-
-    }
-
-  </style>
+</style>
 
 </head>
 
 <body>
 
-  <!-- HEADER -->
+<header>
 
-  <header>
+  <div class="logo">
 
-    <div class="logo">
-
-      <span class="logo-main">
-        WO IST JOSI?
-      </span>
-
-      <span class="logo-sub">
-        LIVE TRACKING
-      </span>
-
-    </div>
-
-    <div class="status-pill">
-
-      <span class="status-dot"></span>
-
-      AIS ECHTZEIT
-
-    </div>
-
-  </header>
-
-  <!-- MAP -->
-
-  <main class="map-wrapper">
-
-    <div class="map-label">
-      ⚓ AKTUELLE POSITION — MMSI 218007170
-    </div>
-
-    <div class="map-container">
-
-      <div id="map"></div>
-
-    </div>
-
-  </main>
-
-  <!-- FOOTER -->
-
-  <footer>
-
-    <span>woistjosi.de</span>
-
-    <span>
-      OpenStreetMap • AIS Tracking
+    <span class="logo-main">
+      WO IST JOSI?
     </span>
 
-  </footer>
+    <span class="logo-sub">
+      LIVE TRACKING
+    </span>
 
-  <!-- MAP SCRIPT -->
+  </div>
 
-  <script>
+  <div class="status-pill">
 
-    /************************************************************
-    DEVICE CHECK
-    ************************************************************/
+    <span class="status-dot"></span>
 
-    const mobile = window.innerWidth < 768;
+    AIS LIVE
 
-    const landscape =
-      window.matchMedia("(orientation: landscape)").matches;
+  </div>
 
-    /************************************************************
-    ZOOM
-    ************************************************************/
+</header>
 
-    let zoomLevel = 6;
+<main class="map-wrapper">
 
-    if (mobile) zoomLevel = 7;
+  <div class="map-label">
+    ⚓ AKTUELLE POSITION — MMSI 218007170
+  </div>
 
-    if (mobile && landscape) zoomLevel = 6;
+  <div class="map-container">
 
-    /************************************************************
-    MAP
-    ************************************************************/
+    <div id="map"></div>
 
-    const map = L.map('map', {
+  </div>
 
-      zoomControl: !mobile,
+</main>
 
-      attributionControl: false,
+<footer>
 
-      dragging: true,
+  <span>woistjosi.de</span>
 
-      touchZoom: true,
+  <span>OpenStreetMap • AIS Tracking</span>
 
-      scrollWheelZoom: true,
+</footer>
 
-      doubleClickZoom: true,
+<script>
 
-      boxZoom: false,
+/************************************************************
+ZOOM
+************************************************************/
 
-      keyboard: true
+const mobile = window.innerWidth < 768;
 
-    }).setView([47.0, -4.0], zoomLevel);
+const zoomLevel = mobile ? 7 : 6;
 
-    /************************************************************
-    OPENSTREETMAP
-    ************************************************************/
+/************************************************************
+MAP
+************************************************************/
 
-    L.tileLayer(
+const map = L.map('map').setView(
 
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  [47.0, -4.0],
 
-      {
+  zoomLevel
 
-        maxZoom: 18
+);
 
-      }
+/************************************************************
+TILES
+************************************************************/
 
-    ).addTo(map);
+L.tileLayer(
 
-    /************************************************************
-    BOAT ICON
-    ************************************************************/
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 
-    const boatIcon = L.divIcon({
+  {
 
-      className: 'boat-icon',
+    maxZoom: 18,
 
-      html: `
-        <div style="
-          width:18px;
-          height:18px;
-          background:#00b4c8;
-          border-radius:50%;
-          box-shadow:
-            0 0 12px rgba(0,180,200,0.9),
-            0 0 24px rgba(0,180,200,0.4);
-        "></div>
-      `,
+    attribution:
+      '&copy; OpenStreetMap contributors'
 
-      iconSize: [18,18],
+  }
 
-      iconAnchor: [9,9]
+).addTo(map);
 
-    });
+/************************************************************
+BOAT ICON
+************************************************************/
 
-    /************************************************************
-    POSITION
-    ************************************************************/
+const boatIcon = L.divIcon({
 
-    const boatPosition = [47.0, -4.0];
+  className: '',
 
-    const marker = L.marker(
+  html: `
+    <div style="
+      width:18px;
+      height:18px;
+      background:#00b4c8;
+      border-radius:50%;
+      box-shadow:
+        0 0 12px rgba(0,180,200,0.9),
+        0 0 24px rgba(0,180,200,0.4);
+    "></div>
+  `,
 
-      boatPosition,
+  iconSize: [18,18],
 
-      {
+  iconAnchor: [9,9]
 
-        icon: boatIcon
+});
 
-      }
+/************************************************************
+MARKER
+************************************************************/
 
-    ).addTo(map);
+L.marker(
 
-    /************************************************************
-    RESIZE FIX
-    ************************************************************/
+  [47.0, -4.0],
 
-    window.addEventListener('resize', () => {
+  {
 
-      setTimeout(() => {
+    icon: boatIcon
 
-        map.invalidateSize();
+  }
 
-      }, 200);
+).addTo(map);
 
-    });
+/************************************************************
+FIX FOR RESIZE / ROTATION
+************************************************************/
 
-  </script>
+window.addEventListener('resize', () => {
+
+  setTimeout(() => {
+
+    map.invalidateSize();
+
+  }, 200);
+
+});
+
+</script>
 
 </body>
 </html>

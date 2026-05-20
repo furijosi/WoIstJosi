@@ -2,509 +2,560 @@
 <html lang="de">
 <head>
 
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width,
-               initial-scale=1,
-               viewport-fit=cover">
+  <!-- MOBILE OPTIMIERT -->
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1,
+                 viewport-fit=cover">
 
-<meta name="theme-color" content="#071526">
+  <!-- APP STYLE -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#071526">
 
-<title>Wo ist Josi?</title>
+  <title>Wo ist Josi?</title>
 
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <!-- FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap"
+        rel="stylesheet">
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
 
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap"
-      rel="stylesheet">
+    /************************************************************
+    RESET
+    ************************************************************/
 
-<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-/************************************************************
-RESET
-************************************************************/
+    html,
+    body {
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+      width: 100%;
+      height: 100%;
 
-html,
-body {
+      overflow: hidden;
 
-  width: 100%;
-  height: 100%;
+      background: #071526;
 
-  overflow: hidden;
+      font-family: 'Barlow', sans-serif;
 
-  background: #071526;
+      -webkit-text-size-adjust: 100%;
 
-  font-family: 'Barlow', sans-serif;
+    }
 
-}
+    :root {
 
-/************************************************************
-BODY
-************************************************************/
+      --deep: #071526;
+      --teal: #00b4c8;
+      --teal-dim: #007d8c;
+      --white: #e8f4f8;
+      --muted: #7a9db5;
 
-body {
+    }
 
-  display: flex;
-  flex-direction: column;
+    /************************************************************
+    BODY
+    ************************************************************/
 
-  color: #e8f4f8;
+    body {
 
-}
+      display: flex;
+      flex-direction: column;
 
-/************************************************************
-HEADER
-************************************************************/
+      color: var(--white);
 
-header {
+    }
 
-  z-index: 1000;
+    body::before {
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+      content: '';
 
-  padding:
-    calc(14px + env(safe-area-inset-top))
-    18px
-    14px;
+      position: fixed;
+      inset: 0;
 
-  background:
-    rgba(7,21,38,0.88);
+      background:
 
-  backdrop-filter: blur(10px);
+        radial-gradient(
+          ellipse 80% 50% at 20% 80%,
+          rgba(0,180,200,0.07) 0%,
+          transparent 60%
+        ),
 
-  border-bottom:
-    1px solid rgba(0,180,200,0.15);
+        radial-gradient(
+          ellipse 60% 40% at 80% 20%,
+          rgba(0,100,160,0.08) 0%,
+          transparent 55%
+        );
 
-}
+      pointer-events: none;
 
-.logo {
+      z-index: 0;
 
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+    }
 
-}
+    /************************************************************
+    HEADER
+    ************************************************************/
 
-.logo-main {
+    header {
 
-  font-family: 'Bebas Neue', sans-serif;
+      position: relative;
+      z-index: 1000;
 
-  font-size: 2.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-  letter-spacing: 0.08em;
+      padding:
+        calc(14px + env(safe-area-inset-top))
+        18px
+        14px;
 
-}
+      background:
+        rgba(7,21,38,0.88);
 
-.logo-sub {
+      backdrop-filter: blur(10px);
 
-  font-size: 0.7rem;
+      border-bottom:
+        1px solid rgba(0,180,200,0.15);
 
-  color: #00b4c8;
+    }
 
-  letter-spacing: 0.22em;
+    .logo {
 
-}
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
 
-/************************************************************
-STATUS
-************************************************************/
+    }
 
-.status-pill {
+    .logo-main {
 
-  display: flex;
-  align-items: center;
-  gap: 8px;
+      font-family: 'Bebas Neue', sans-serif;
 
-  padding: 6px 12px;
+      font-size: 2.2rem;
 
-  border:
-    1px solid rgba(0,180,200,0.3);
+      letter-spacing: 0.08em;
 
-  border-radius: 999px;
+    }
 
-  font-size: 0.72rem;
+    .logo-sub {
 
-  color: #7a9db5;
+      font-size: 0.7rem;
 
-}
+      color: var(--teal);
 
-.status-dot {
+      letter-spacing: 0.22em;
 
-  width: 8px;
-  height: 8px;
+    }
 
-  border-radius: 50%;
+    /************************************************************
+    STATUS
+    ************************************************************/
 
-  background: #00b4c8;
+    .status-pill {
 
-  animation: pulse 2s infinite;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-}
+      padding: 6px 12px;
 
-@keyframes pulse {
+      border:
+        1px solid rgba(0,180,200,0.3);
 
-  0%,100% {
+      border-radius: 999px;
 
-    opacity: 1;
+      font-size: 0.72rem;
 
-  }
+      color: var(--muted);
 
-  50% {
+    }
 
-    opacity: 0.4;
+    .status-dot {
 
-  }
+      width: 8px;
+      height: 8px;
 
-}
+      border-radius: 50%;
 
-/************************************************************
-MAP WRAPPER
-************************************************************/
+      background: var(--teal);
 
-.map-wrapper {
+      animation: pulse 2s infinite;
 
-  flex: 1;
+    }
 
-  display: flex;
-  flex-direction: column;
+    @keyframes pulse {
 
-  padding: 10px;
+      0%,100% {
 
-  min-height: 0;
+        opacity: 1;
 
-}
+      }
 
-/************************************************************
-LABEL
-************************************************************/
+      50% {
 
-.map-label {
+        opacity: 0.4;
 
-  font-size: 0.58rem;
+      }
 
-  letter-spacing: 0.18em;
+    }
 
-  color: #007d8c;
+    /************************************************************
+    MAP WRAPPER
+    ************************************************************/
 
-  margin-bottom: 8px;
+    .map-wrapper {
 
-  text-transform: uppercase;
+      position: relative;
+      z-index: 5;
 
-}
+      flex: 1;
 
-/************************************************************
-MAP CONTAINER
-************************************************************/
+      display: flex;
+      flex-direction: column;
 
-.map-container {
+      padding: 10px;
 
-  position: relative;
+      min-height: 0;
 
-  flex: 1;
+    }
 
-  min-height: 0;
+    /************************************************************
+    LABEL
+    ************************************************************/
 
-  border-radius: 10px;
+    .map-label {
 
-  overflow: hidden;
+      font-size: 0.58rem;
 
-  border:
-    1px solid rgba(0,180,200,0.2);
+      letter-spacing: 0.18em;
 
-  box-shadow:
-    0 10px 40px rgba(0,0,0,0.45);
+      color: var(--teal-dim);
 
-}
+      margin-bottom: 8px;
 
-/************************************************************
-MAP
-************************************************************/
+      text-transform: uppercase;
 
-#map {
+    }
 
-  width: 100%;
-  height: 100%;
+    /************************************************************
+    MAP CONTAINER
+    ************************************************************/
 
-}
+    .map-container {
 
-/************************************************************
-LEAFLET
-************************************************************/
+      position: relative;
 
-.leaflet-container {
+      flex: 1;
 
-  background: #071526;
+      min-height: 0;
 
-  touch-action: pan-x pan-y;
+      border-radius: 10px;
 
-}
+      overflow: hidden;
 
-/************************************************************
-FOOTER
-************************************************************/
+      border:
+        1px solid rgba(0,180,200,0.2);
 
-footer {
+      box-shadow:
+        0 10px 40px rgba(0,0,0,0.45);
 
-  padding:
-    10px
-    18px
-    calc(10px + env(safe-area-inset-bottom));
+      background: #071526;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    }
 
-  font-size: 0.62rem;
+    /************************************************************
+    VESSELFINDER
+    ************************************************************/
 
-  color: #7a9db5;
+    #vfmap {
 
-  background:
-    rgba(7,21,38,0.7);
+      width: 100%;
+      height: 100%;
 
-  border-top:
-    1px solid rgba(0,180,200,0.1);
+      min-height: 400px;
 
-}
+    }
 
-/************************************************************
-MOBILE
-************************************************************/
+    /************************************************************
+    POPUPS AUSBLENDEN
+    ************************************************************/
 
-@media (max-width: 768px) {
+    .leaflet-popup-pane,
+    .leaflet-popup,
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip-container,
+    .leaflet-popup-close-button,
+    [class*="popup"],
+    [class*="Popup"],
+    [class*="vessel-info"],
+    [class*="ship-info"],
+    [class*="vf-info"] {
 
-  .logo-main {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
 
-    font-size: 1.6rem;
+    }
 
-  }
+    /************************************************************
+    FOOTER
+    ************************************************************/
 
-  .logo-sub {
+    footer {
 
-    font-size: 0.58rem;
+      position: relative;
+      z-index: 1000;
 
-  }
+      padding:
+        10px
+        18px
+        calc(10px + env(safe-area-inset-bottom));
 
-  .status-pill {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-    display: none;
+      font-size: 0.62rem;
 
-  }
+      color: var(--muted);
 
-  footer {
+      background:
+        rgba(7,21,38,0.7);
 
-    flex-direction: column;
+      border-top:
+        1px solid rgba(0,180,200,0.1);
 
-    gap: 4px;
+    }
 
-    text-align: center;
+    footer a {
 
-  }
+      color: var(--teal-dim);
+      text-decoration: none;
 
-}
+    }
 
-/************************************************************
-LANDSCAPE MOBILE
-************************************************************/
+    /************************************************************
+    MOBILE
+    ************************************************************/
 
-@media (max-width: 950px) and (orientation: landscape) {
+    @media (max-width: 768px) {
 
-  header {
+      .logo-main {
 
-    padding:
-      calc(8px + env(safe-area-inset-top))
-      14px
-      8px;
+        font-size: 1.6rem;
 
-  }
+      }
 
-  .logo-main {
+      .logo-sub {
 
-    font-size: 1.2rem;
+        font-size: 0.58rem;
 
-  }
+      }
 
-  .map-wrapper {
+      .status-pill {
 
-    padding: 6px;
+        display: none;
 
-  }
+      }
 
-  .map-label {
+      footer {
 
-    margin-bottom: 5px;
+        flex-direction: column;
 
-    font-size: 0.48rem;
+        gap: 4px;
 
-  }
+        text-align: center;
 
-  footer {
+      }
 
-    display: none;
+    }
 
-  }
+    /************************************************************
+    LANDSCAPE MOBILE
+    ************************************************************/
 
-}
+    @media (max-width: 950px) and (orientation: landscape) {
 
-</style>
+      header {
+
+        padding:
+          calc(8px + env(safe-area-inset-top))
+          14px
+          8px;
+
+      }
+
+      .logo-main {
+
+        font-size: 1.2rem;
+
+      }
+
+      .map-wrapper {
+
+        padding: 6px;
+
+      }
+
+      .map-label {
+
+        margin-bottom: 5px;
+
+        font-size: 0.48rem;
+
+      }
+
+      footer {
+
+        display: none;
+
+      }
+
+    }
+
+  </style>
 
 </head>
 
 <body>
 
-<header>
+  <!-- HEADER -->
 
-  <div class="logo">
+  <header>
 
-    <span class="logo-main">
-      WO IST JOSI?
+    <div class="logo">
+
+      <span class="logo-main">
+        WO IST JOSI?
+      </span>
+
+      <span class="logo-sub">
+        LIVE TRACKING
+      </span>
+
+    </div>
+
+    <div class="status-pill">
+
+      <span class="status-dot"></span>
+
+      AIS LIVE
+
+    </div>
+
+  </header>
+
+  <!-- MAP -->
+
+  <main class="map-wrapper">
+
+    <div class="map-label">
+      ⚓ AKTUELLE POSITION — MMSI 218007170
+    </div>
+
+    <div class="map-container">
+
+      <div id="vfmap"></div>
+
+      <!-- VESSELFINDER -->
+
+      <script type="text/javascript">
+
+        const mobile = window.innerWidth < 768;
+
+        var width      = "100%";
+        var height     = "100%";
+
+        var mmsi       = "218007170";
+
+        var show_track = true;
+
+        var names      = false;
+
+        /* Desktop weiter raus */
+        var zoom       = mobile ? 7 : 6;
+
+      </script>
+
+      <script
+        type="text/javascript"
+        src="https://www.vesselfinder.com/aismap.js">
+      </script>
+
+      <!-- POPUP ENTFERNEN -->
+
+      <script>
+
+        function removeVFPopups() {
+
+          document.querySelectorAll(
+
+            '.leaflet-popup-pane,' +
+            '.leaflet-popup,' +
+            '[class*="popup"],' +
+            '[class*="Popup"],' +
+            '[class*="vessel-info"],' +
+            '[class*="ship-info"],' +
+            '[class*="vf-info"]'
+
+          ).forEach(el => {
+
+            el.style.display = 'none';
+            el.style.visibility = 'hidden';
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+
+          });
+
+          document.querySelectorAll(
+
+            '.leaflet-marker-icon'
+
+          ).forEach(el => {
+
+            el.style.pointerEvents = 'none';
+
+          });
+
+        }
+
+        /* dauerhaft prüfen */
+        setInterval(removeVFPopups, 500);
+
+      </script>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    <span>woistjosi.de</span>
+
+    <span>
+
+      Kartendaten:
+      <a href="https://www.vesselfinder.com"
+         target="_blank"
+         rel="noopener">
+
+        VesselFinder
+
+      </a>
+
     </span>
 
-    <span class="logo-sub">
-      LIVE TRACKING
-    </span>
-
-  </div>
-
-  <div class="status-pill">
-
-    <span class="status-dot"></span>
-
-    AIS LIVE
-
-  </div>
-
-</header>
-
-<main class="map-wrapper">
-
-  <div class="map-label">
-    ⚓ AKTUELLE POSITION — MMSI 218007170
-  </div>
-
-  <div class="map-container">
-
-    <div id="map"></div>
-
-  </div>
-
-</main>
-
-<footer>
-
-  <span>woistjosi.de</span>
-
-  <span>OpenStreetMap • AIS Tracking</span>
-
-</footer>
-
-<script>
-
-/************************************************************
-ZOOM
-************************************************************/
-
-const mobile = window.innerWidth < 768;
-
-const zoomLevel = mobile ? 7 : 6;
-
-/************************************************************
-MAP
-************************************************************/
-
-const map = L.map('map').setView(
-
-  [47.0, -4.0],
-
-  zoomLevel
-
-);
-
-/************************************************************
-TILES
-************************************************************/
-
-L.tileLayer(
-
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-  {
-
-    maxZoom: 18,
-
-    attribution:
-      '&copy; OpenStreetMap contributors'
-
-  }
-
-).addTo(map);
-
-/************************************************************
-BOAT ICON
-************************************************************/
-
-const boatIcon = L.divIcon({
-
-  className: '',
-
-  html: `
-    <div style="
-      width:18px;
-      height:18px;
-      background:#00b4c8;
-      border-radius:50%;
-      box-shadow:
-        0 0 12px rgba(0,180,200,0.9),
-        0 0 24px rgba(0,180,200,0.4);
-    "></div>
-  `,
-
-  iconSize: [18,18],
-
-  iconAnchor: [9,9]
-
-});
-
-/************************************************************
-MARKER
-************************************************************/
-
-L.marker(
-
-  [47.0, -4.0],
-
-  {
-
-    icon: boatIcon
-
-  }
-
-).addTo(map);
-
-/************************************************************
-FIX FOR RESIZE / ROTATION
-************************************************************/
-
-window.addEventListener('resize', () => {
-
-  setTimeout(() => {
-
-    map.invalidateSize();
-
-  }, 200);
-
-});
-
-</script>
+  </footer>
 
 </body>
 </html>
